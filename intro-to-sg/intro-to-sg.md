@@ -7,7 +7,9 @@ If you've ever written code, you probably know:
 
 You might have not tried out advanced code search tools like SourceGraph because getting started looks like too much effort.
 
-The SourceGraph getting started page already has a ton of information about different ways to start using SourceGraph, but here we'll go through an *opinionated* set up guide. We'll
+The SourceGraph getting started page already has a ton of information about different ways to start using SourceGraph, but here we'll go through an *opinionated* set up guide.
+
+Specifically, We'll
 
 * ☁️ Set up SourceGraph on a VPS (DigitalOcean, but feel free to use your own cloud provider)
 * 🚍 Set up Nginx as reverse proxy
@@ -22,7 +24,7 @@ At the end of this guide, you'll have your own SourceGraph server set up on a cu
 
 You'll be able to search through all your code using advanced syntax and better defaults.
 
-[Screenshot]
+![The SourceGraph dashboard](images/sourcegraph-dashboard.png)
 
 ## ☑️ Requirements to follow along
 
@@ -70,7 +72,7 @@ docker run --publish 7080:7080 --publish 127.0.0.1:3370:3370 --rm --volume ~/.so
 
 This will take half a minute or so to pull the dependencies and initialise SourceGraph and then you'll see SourceGraph running on port 7080. 
 
-![SourceGraph running in the terminal](running-sourcegraph-cmd.png)
+![SourceGraph running in the terminal](images/running-sourcegraph-cmd.png)
 
 Press `Ctrl-B` and then tap `d` to detach the Tmux session. This will leave SourceGraph running in the background even after you close the SSH sessions. 
 
@@ -91,13 +93,13 @@ We could access our server by typing in the IP address, but it's hard to remembe
 
 Instead, we'll point a subdomain of a domain we control - e.g. `sg.example.com` at the DigitalOcean droplet so that we can access the SourceGraph server by visiting this domain.
 
-![DNS record](dns-example.png)
+![DNS record](images/dns-example.png)
 
 In your DNS control panel, add an "A" record that points a subdomain to the IP address (the same one you used to connect to your VPS via SSH). 
 
 In NameCheap, this looks as follows, but this will change depending on your domain registrar or DNS provider.
 
-![Add subdomain DNS record](add-dns-record.png)
+![Add subdomain DNS record](images/add-dns-record.png)
 
 Save the changes and wait for the DNS record to propagate. This can take up to 72 hours, but in practice usually takes less than 5 minutes.
 
@@ -113,7 +115,7 @@ sudo apt update && sudo apt install nginx
 
 Once installed, you should be able to visit the subdomain we configured in the previous step `sg.example.com` and see the Nginx default welcome page.
 
-![Default Nginx Page](welcome-nginx.png)
+![Default Nginx Page](images/welcome-nginx.png)
 
 ### Configuring Nginx
 
@@ -194,7 +196,7 @@ SourceGraph is very configurable and has many different options. The two most im
 
 Visit https://sg.ritza.co/site-admin/configuration and uncomment the third line (remove the `//` at the start). Then replace the domain with the subdomain that we chose earlier.
 
-![Configuring the external domain](sourcegraph-configure-domain.png)
+![Configuring the external domain](images/sourcegraph-configure-domain.png)
 
 Press the green "Save Changes" button and choose "Restart Server" when prompted.
 
@@ -227,7 +229,7 @@ Click the blue "Add repositories" button below the text box and wait for SourceG
 
 While it's doing that, you can go ahead and try out your first SourceGraph search (which might be incomplete while the repos are still cloning). For example, below you can see all empty print statements in Python files across all code.
 
-![Searching for empty print statements](sourcegraph-empty-print.png)
+![Searching for empty print statements](images/sourcegraph-empty-print.png)
 
 Unlike GitHub search, it respects the specials characters and only returns matches including the `()`. It also has easy options to exclude or include forks, match case, and a lot more besides. 
 
