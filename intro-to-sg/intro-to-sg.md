@@ -1,4 +1,4 @@
-# The opinionated guide to setting up a SourceGraph server for more productive advanced code searching
+# The opinionated guide to setting up a SourceGraph server for more productive advanced code search
 
 If you've ever written code, you probably know: 
 
@@ -9,7 +9,7 @@ You might have not tried out advanced code search tools like SourceGraph because
 
 The SourceGraph getting started page already has a ton of information about different ways to start using SourceGraph, but here we'll go through an *opinionated* set up guide.
 
-Specifically, We'll
+Specifically, we'll:
 
 * ☁️ Set up SourceGraph on a VPS (DigitalOcean, but feel free to use your own cloud provider)
 * 🚍 Set up Nginx as reverse proxy
@@ -225,7 +225,7 @@ For example, in the configuration below we clone all public repositories from `g
 
 Click the blue "Add repositories" button below the text box and wait for SourceGraph to clone and index your repositories.
 
-## Running your first SourceGraph search
+## 🔎 Running your first SourceGraph search
 
 While it's doing that, you can go ahead and try out your first SourceGraph search (which might be incomplete while the repos are still cloning). For example, below you can see all empty print statements in Python files across all code.
 
