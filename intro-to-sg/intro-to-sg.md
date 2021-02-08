@@ -48,7 +48,7 @@ Finally, click "Create" and wait a few seconds until you get your IP address and
 
 ### ⚒️ Configuring the VPS
 
-We're going to just use the default `root` user which has some security implications but as we are not going to use this server for anything except SourceGraph, these are not major.
+We're going to just use the default `root` user which has some security implications but as we are not going to use this server for anything except SourceGraph, these are not major. If you prefer to set everything up as a non-root user, you'll need to prefix most of the Linux commands with `sudo`.
 
 Connect to your instance with SSH, substituting the IP address you got from DigitalOcean.
 
@@ -110,7 +110,7 @@ Instead of having users connect directly to the port opened by Docker, we're goi
 ![Architecture](images/nginx-docker-sourcegraph.png)
 
 ```bash
-sudo apt update && sudo apt install nginx
+apt update && apt install nginx
 ```
 
 Once installed, you should be able to visit the subdomain we configured in the previous step `sg.example.com` and see the Nginx default welcome page.
@@ -212,7 +212,7 @@ Now navigate to [https://sg.ritza.co/site-admin/external-services/new](https://s
 * Add any organizations for which you want to clone and index **all** repositories.
 * Add any individual repositories that you want to clone and index.
 
-For example, in the configuration below, we clone all public repositories from `google` and all public and private repositories from `ritza-co` (as the GitHub token has access to the ritza-co org). We also add repositories for React and Tensorflow individually.
+For example, in the configuration below, we clone all public repositories from `google` and all public and private repositories from `ritza-co` (in our example, the GitHub token has access to the whole `ritza-co` org). We also add repositories for React and Tensorflow individually.
 
 ```
 {
@@ -234,33 +234,3 @@ While it's doing that, you can go ahead and try out your first SourceGraph searc
 Unlike GitHub search, it respects the specials characters and only returns matches including the `()`. It also has easy options to exclude or include forks, match case, and a lot more besides. 
 
 Take a look at [https://docs.sourcegraph.com/code_search/tutorials/examples](https://docs.sourcegraph.com/code_search/tutorials/examples) for some example searches and to start getting to know the syntax.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
