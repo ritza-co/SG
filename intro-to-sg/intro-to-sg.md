@@ -1,4 +1,4 @@
-# The Opinionated Guide to Setting Up a SourceGraph Server for a More Productive Advanced Code Search
+# The Opinionated Guide to Setting Up a SourceGraph Server for More Productive Advanced Code Search
 
 If you've ever written code, you probably know that: 
 
