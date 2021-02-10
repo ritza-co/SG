@@ -1,30 +1,30 @@
-# The Opinionated Guide to Setting Up a SourceGraph Server for More Productive Advanced Code Search
+# The Opinionated Guide to Setting Up a Sourcegraph Server for More Productive Advanced Code Search
 
 If you've ever written code, you probably know that: 
 
 * 🔍 Searching through examples of code is useful for so many things.
 * 🤦‍♂️ GitHub search kind of sucks.
 
-You might not have tried out advanced code search tools like SourceGraph because getting started looks like too much effort.
+You might not have tried out advanced code search tools like Sourcegraph because getting started looks like too much effort.
 
-The SourceGraph "Getting Started" page already has a ton of information about different ways to start using SourceGraph, but here we'll go through an *opinionated* set up guide.
+The Sourcegraph "Getting Started" page already has a ton of information about different ways to start using Sourcegraph, but here we'll go through an *opinionated* set up guide.
 
 Specifically, we'll:
 
-* ☁️ Set up SourceGraph on a VPS (DigitalOcean in this case, but feel free to use your own cloud provider).
+* ☁️ Set up Sourcegraph on a VPS (DigitalOcean in this case, but feel free to use your own cloud provider).
 * 🚍 Set up Nginx as reverse proxy.
 * 🎫 Use LetsEncrypt to get an SSL certificate.
 * 👩‍💻 Integrate with GitHub to search through public and private repositories hosted there.
 
-This is a tradeoff between running SourceGraph locally on your dev machine (where features would be limited), and installing it to a cluster (where set up would take longer).
+This is a tradeoff between running Sourcegraph locally on your dev machine (where features would be limited), and installing it to a cluster (where set up would take longer).
 
 ## 🖼 The End Result of Following This Guide
 
-At the end of this guide, you'll have your own SourceGraph server set up on a custom domain like `sg.example.com`. It will periodically fetch any repositories you are interested in from GitHub (private, public, or from your entire GitHub org) and update its index so that you have these at your fingertips.
+At the end of this guide, you'll have your own Sourcegraph server set up on a custom domain like `sg.example.com`. It will periodically fetch any repositories you are interested in from GitHub (private, public, or from your entire GitHub org) and update its index so that you have these at your fingertips.
 
 You'll be able to search through all your code using advanced syntax and better defaults.
 
-![The SourceGraph dashboard](images/sourcegraph-dashboard.png)
+![The Sourcegraph dashboard](images/sourcegraph-dashboard.png)
 
 ## ☑️ Requirements to Follow Along
 
@@ -34,9 +34,9 @@ To follow along, you should:
 * 🌐 Have a custom domain where you can add new subdomains, e.g. through NameCheap or similar.
 * ☁️ Have an account at a cloud provider, such as DigitalOcean or AWS.
 
-## 🔨 Setting Up the VPS and Installing Docker and SourceGraph
+## 🔨 Setting Up the VPS and Installing Docker and Sourcegraph
 
-First, we need to set up a VPS running Ubuntu 18.04. On this, we'll install Docker and pull the SourceGraph Docker image.
+First, we need to set up a VPS running Ubuntu 18.04. On this, we'll install Docker and pull the Sourcegraph Docker image.
 
 ![Create Droplet](images/create-droplet.png)
 
@@ -48,7 +48,7 @@ Finally, click "Create" and wait a few seconds until you get your IP address and
 
 ### ⚒️ Configuring the VPS
 
-We're going to just use the default `root` user which has some security implications but as we are not going to use this server for anything except SourceGraph, these are not major. If you prefer to set everything up as a non-root user, you'll need to prefix most of the Linux commands with `sudo`.
+We're going to just use the default `root` user which has some security implications but as we are not going to use this server for anything except Sourcegraph, these are not major. If you prefer to set everything up as a non-root user, you'll need to prefix most of the Linux commands with `sudo`.
 
 Connect to your instance with SSH, substituting the IP address you got from DigitalOcean.
 
@@ -62,19 +62,19 @@ Install Docker by running:
 snap install docker
 ```
 
-Open a Tmux pane (where we'll leave SourceGraph running) by typing `tmux`.
+Open a Tmux pane (where we'll leave Sourcegraph running) by typing `tmux`.
 
-Now pull the SourceGraph Docker container by running (check for an updated version of this command at https://about.sourcegraph.com/get-started).
+Now pull the Sourcegraph Docker container by running (check for an updated version of this command at https://about.sourcegraph.com/get-started).
 
 ```bash
 docker run --publish 7080:7080 --publish 127.0.0.1:3370:3370 --rm --volume ~/.sourcegraph/config:/etc/sourcegraph --volume ~/.sourcegraph/data:/var/opt/sourcegraph sourcegraph/server:3.24.1
 ```
 
-It will take half a minute or so to pull the dependencies and initialise SourceGraph and then you'll see SourceGraph running on port 7080. 
+It will take half a minute or so to pull the dependencies and initialise Sourcegraph and then you'll see Sourcegraph running on port 7080. 
 
-![SourceGraph running in the terminal](images/running-sourcegraph-cmd.png)
+![Sourcegraph running in the terminal](images/running-sourcegraph-cmd.png)
 
-Press `Ctrl-B` and then tap `d` to detach the Tmux session. This will leave SourceGraph running in the background even after you close the SSH sessions. 
+Press `Ctrl-B` and then tap `d` to detach the Tmux session. This will leave Sourcegraph running in the background even after you close the SSH sessions. 
 
 If you want to test it out at this stage, open a **new** SSH connection to your server along with a local portforward (substituting your DigitalOcean IP address again)
 
@@ -82,16 +82,16 @@ If you want to test it out at this stage, open a **new** SSH connection to your 
 ssh -L 7080:localhost:7080 root@68.183.10.58
 ```
 
-This will forward your local port 7080 through SSH to connect to `localhost:7080` on the DigitalOcean instance where SourceGraph is running. On your local machine, you can now visit `http://localhost:7080` in your browser and you should see the SourceGraph welcome page.
+This will forward your local port 7080 through SSH to connect to `localhost:7080` on the DigitalOcean instance where Sourcegraph is running. On your local machine, you can now visit `http://localhost:7080` in your browser and you should see the Sourcegraph welcome page.
 
-![Welcome to SourceGraph](images/sourcegraph-welcome.png)
+![Welcome to Sourcegraph](images/sourcegraph-welcome.png)
 
 Don't sign up yet – let's first set up a proper connection using a custom domain and SSL.
 
 ## 👉 Pointing a Domain at your Droplet
 We could access our server by typing in the IP address, but it's hard to remember and we can't easily get an SSL certificate to access our code securely over HTTPS this way. 
 
-Instead, we'll point a subdomain of a domain we control – e.g. `sg.example.com` at the DigitalOcean droplet so that we can access the SourceGraph server by visiting this domain.
+Instead, we'll point a subdomain of a domain we control – e.g. `sg.example.com` at the DigitalOcean droplet so that we can access the Sourcegraph server by visiting this domain.
 
 ![DNS record](images/dns-example.png)
 
@@ -150,7 +150,7 @@ server {
 }
 ```
 
-This links up the running Docker container with Nginx, meaning that any traffic that comes in on our `sg.example.com` subdomain will be redirected to the SourceGraph server running inside Docker.
+This links up the running Docker container with Nginx, meaning that any traffic that comes in on our `sg.example.com` subdomain will be redirected to the Sourcegraph server running inside Docker.
 
 Save the file and run:
 
@@ -183,14 +183,14 @@ And follow the prompts to:
 
 Certbot will automatically modify the Nginx config file that we edited earlier to use `https` instead of `http`. 
 
-Visit `https://sg.example.com` and now you can finally fill out the form to sign up for SourceGraph.
+Visit `https://sg.example.com` and now you can finally fill out the form to sign up for Sourcegraph.
 
-## ✏️ Configuring SourceGraph with the Domain and GitHub
+## ✏️ Configuring Sourcegraph with the Domain and GitHub
 
-SourceGraph is very configurable and has many different options. The two most important ones to get started with using it are:
+Sourcegraph is very configurable and has many different options. The two most important ones to get started with using it are:
 
-* Tell SourceGraph where it is hosted.
-* Tell SourceGraph where to find your code.
+* Tell Sourcegraph where it is hosted.
+* Tell Sourcegraph where to find your code.
 
 ### Configuring the domain
 
@@ -223,11 +223,11 @@ For example, in the configuration below, we clone all public repositories from `
 }
 ```
 
-Click the blue "Add repositories" button below the text box and wait for SourceGraph to clone and index your repositories.
+Click the blue "Add repositories" button below the text box and wait for Sourcegraph to clone and index your repositories.
 
-## 🔎 Running Your first SourceGraph Search
+## 🔎 Running Your first Sourcegraph Search
 
-While it's doing that, you can go ahead and try out your first SourceGraph search (which might be incomplete while the repos are still cloning). For example, below you can see all empty print statements in Python files across all code.
+While it's doing that, you can go ahead and try out your first Sourcegraph search (which might be incomplete while the repos are still cloning). For example, below you can see all empty print statements in Python files across all code.
 
 ![Searching for empty print statements](images/sourcegraph-empty-print.png)
 
