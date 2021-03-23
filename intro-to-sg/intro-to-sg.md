@@ -158,7 +158,7 @@ Save the file and run:
 service nginx reload
 ```
 
-You should now be able to see the same Source Welcome page running on `http://sg.example.com`.  Note that the secure version (`https`) will not work yet, as we still need to set up an SSL certificate.
+You should now be able to see the same Sourcegraph welcome page running on `http://sg.example.com`.  Note that the secure version (`https`) will not work yet, as we still need to set up an SSL certificate.
 
 ## 🎫 Getting an SSL Certificate with LetsEncrypt
 
